@@ -3,6 +3,9 @@ EXEC = as_exec
 CC ?= gcc
 CFLAGS = -Wall -std=gnu99 -g
 
+TEMP0 ?= 1
+IN_FILE ?= ./tests/fib-iterative.s
+
 GIT_HOOKS := .git/hooks/applie
 .PHONY: all
 all: $(GIT_HOOKS) $(EXEC)
@@ -47,6 +50,9 @@ check: $(EXEC) $(TEST_DONE)
 
 test: $(EXEC)
 	@python tests/runner.py
+
+fib: $(EXEC)
+	@./$(EXEC) --input $(TEMP0) $(IN_FILE)
 
 clean:
 	$(RM) $(EXEC) $(OBJS) $(deps) opcode.h

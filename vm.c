@@ -63,15 +63,14 @@ static inline void vm_push(vm_env *env, size_t n);
 #define VM_JGE() VM_J_TYPE_INST(>=)
 #define VM_JGT() VM_J_TYPE_INST(>)
 #define VM_JNZ() VM_J_TYPE_INST(!=)
-
-#define VM_CALL_HANDLER()                               \
-    do {                                                \
-        if (OPCODE_IMPL(OPCODE).handler)                \
-            OPCODE_IMPL(OPCODE).handler(                \
-                vm_get_op_value(env, &OPCODE.op1),      \
-                vm_get_op_value(env, &OPCODE.op2),      \
-                vm_get_temp_value(env, OPCODE.result)); \
-        DISPATCH;                                       \
+#define VM_CALL_HANDLER()                                        \
+    do {                                                         \
+        if (OPCODE_IMPL(OPCODE).handler)                         \
+            OPCODE_IMPL(OPCODE)                                  \
+                .handler(vm_get_op_value(env, &OPCODE.op1),      \
+                         vm_get_op_value(env, &OPCODE.op2),      \
+                         vm_get_temp_value(env, OPCODE.result)); \
+        DISPATCH;                                                \
     } while (0)
 
 /* Constant pool max size */
@@ -222,6 +221,13 @@ void vm_run(vm_env *env)
     END_OPCODES;
 terminate:
     return;
+}
+
+inline void vm_set_temp_value(vm_env *env, int pos, int val)
+{
+    vm_value v = {.type = INT};
+    v.value.vint = val;
+    env->temps[pos] = v;
 }
 
 static int vm_insts_seg_inflate(vm_env *env, char *mem, size_t sz)
